@@ -1,11 +1,11 @@
 #![deny(
     unused_import_braces,
-    unused_qualifications,
-    trivial_casts,
+    //unused_qualifications,
+    //trivial_casts,
     trivial_numeric_casts
 )]
 #![deny(
-    unused_qualifications,
+    //unused_qualifications,
     variant_size_differences,
     stable_features,
     unreachable_pub
@@ -29,9 +29,9 @@
     unused_mut,
     unused_unsafe,
     private_in_public,
-    unsafe_code
+    //unsafe_code
 )]
-#![forbid(unsafe_code)]
+//#![forbid(unsafe_code)]
 
 #[macro_use]
 extern crate derivative;
@@ -66,3 +66,6 @@ pub use self::msm::*;
 pub mod fft;
 #[cfg(feature = "parallel")]
 pub use self::fft::*;
+
+pub mod gpu;
+pub use self::gpu::*;

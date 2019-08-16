@@ -1,5 +1,5 @@
 use crate::curves::PairingEngine;
-use crate::fields::PrimeField;
+use crate::fields::{PrimeField, FpParameters};
 use itertools::join;
 
 static DEFS_SRC : &str = include_str!("common/defs.cl");
@@ -28,7 +28,7 @@ fn calc_inv(a: u64) -> u64 {
 
 fn params<F>(name: &str) -> String where F: PrimeField {
     let one = F::one(); let one = limbs_of(&one);
-    let p = F::characteristic(); let p = limbs_of(&p);
+    let p = F::Params::MODULUS; let p = limbs_of(&p);
     let limbs = one.len();
     let inv = calc_inv(p[0]);
     let limbs_def = format!("#define {}_LIMBS {}", name, limbs);

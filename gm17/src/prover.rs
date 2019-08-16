@@ -262,7 +262,7 @@ where
     );
     drop(h);
 
-    let log_d = f64::from(prover.a.len() as f64).log2().ceil() as u32;
+    let log_d = (f64::from(prover.a.len() as f64).log2().ceil() as u32) + 1;
 
     let mut multiexp_kern = VariableBaseMSM::<E>::gpu_multiexp_supported(log_d).ok();
 

@@ -24,10 +24,8 @@ impl error::Error for GPUError {
     }
 }
 
-#[cfg(feature = "ocl")]
 use ocl;
 
-#[cfg(feature = "ocl")]
 impl From<ocl::Error> for GPUError {
     fn from(error: ocl::Error) -> Self {
         GPUError {msg: error.to_string() }

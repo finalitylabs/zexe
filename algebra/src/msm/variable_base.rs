@@ -4,10 +4,11 @@ use crate::{
     PairingEngine, GPUResult, MultiexpKernel
 };
 use rayon::prelude::*;
+use std::marker::PhantomData;
 
-pub struct VariableBaseMSM;
+pub struct VariableBaseMSM<E>(PhantomData<E>);
 
-impl VariableBaseMSM {
+impl<E> VariableBaseMSM<E> where E: PairingEngine {
     fn msm_inner<G: AffineCurve>(
         bases: &[G],
         scalars: &[<G::ScalarField as PrimeField>::BigInt],
@@ -90,7 +91,7 @@ impl VariableBaseMSM {
         Self::msm_inner(bases, scalars)
     }
 
-    pub fn gpu_multiexp_supported<E>(log_d: u32) -> GPUResult<MultiexpKernel<E>> where E: PairingEngine {
+    pub fn gpu_multiexp_supported(log_d: u32) -> GPUResult<MultiexpKernel<E>> {
         let kern = MultiexpKernel::<E>::create(1 << log_d)?;
         Ok(kern)
     }

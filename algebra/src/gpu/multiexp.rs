@@ -1,10 +1,11 @@
 use ocl::{ProQue, Buffer, MemFlags};
 use crate::curves::PairingEngine;
 use crate::fields::PrimeField;
-use crate::curves::AffineCurve;
+use crate::curves::{AffineCurve, ProjectiveCurve};
 use super::error::{GPUResult, GPUError};
 use super::sources;
 use super::structs;
+use std::ops::AddAssign;
 
 const NUM_GROUPS : usize = 224;
 const WINDOW_SIZE : usize = 8;
@@ -45,12 +46,11 @@ impl<E> MultiexpKernel<E> where E: PairingEngine {
         scalars: &[<G::ScalarField as PrimeField>::BigInt],
     ) -> GPUResult<G::Projective> {
 
-        /*let exp_bits = std::mem::size_of::<E::Fr>() * 8;
-        let n = exps.len();
+        let scalar_bits = std::mem::size_of::<E::Fr>() * 8;
+        let n = scalars.len();
 
-        let mut res = [<G as AffineCurve>::Projective::zero(); NUM_WINDOWS * NUM_GROUPS];
-        let exps = unsafe { std::mem::transmute::<Arc<Vec<<<G::Engine as ScalarEngine>::Fr as PrimeField>::Repr>>,Arc<Vec<<E::Fr as PrimeField>::Repr>>>(exps) }.to_vec();
-        let texps = unsafe { std::mem::transmute::<&[<E::Fr as PrimeField>::Repr], &[structs::PrimeFieldStruct::<E::Fr>]>(&exps[..]) };
+        let mut res = [G::Projective::zero(); NUM_WINDOWS * NUM_GROUPS];
+        let texps = unsafe { std::mem::transmute::<&[<G::ScalarField as PrimeField>::BigInt], &[structs::PrimeFieldStruct::<E::Fr>]>(scalars) };
         self.exp_buffer.write(texps).enq()?;
 
         let mut gws = NUM_WINDOWS * NUM_GROUPS;
@@ -67,34 +67,29 @@ impl<E> MultiexpKernel<E> where E: PairingEngine {
                 .arg(&self.g1_bucket_buffer)
                 .arg(&self.g1_result_buffer)
                 .arg(&self.exp_buffer)
-                .arg(&self.dm_buffer)
-                .arg(skip as u32)
                 .arg(n as u32)
                 .arg(NUM_GROUPS as u32)
                 .arg(NUM_WINDOWS as u32)
                 .arg(WINDOW_SIZE as u32)
                 .build()?;
             unsafe { kernel.enq()?; }
-            let tres = unsafe { std::mem::transmute::<&mut [<G as AffineCurve>::Projective], &mut [structs::ProjectiveCurveStruct::<E::G1>]>(&mut res) };
+            let tres = unsafe { std::mem::transmute::<&mut [G::Projective], &mut [structs::ProjectiveCurveStruct::<E::G1Projective>]>(&mut res) };
             self.g1_result_buffer.read(tres).enq()?;
-
         } else {
             return Err(GPUError {msg: "Only E::G1!".to_string()} );
         }
 
-        let mut acc = <G as AffineCurve>::Projective::zero();
+        let mut acc = G::Projective::zero();
         let mut bits = 0;
         for i in 0..NUM_WINDOWS {
-            let w = std::cmp::min(WINDOW_SIZE, exp_bits - bits);
-            for _ in 0..w { acc.double(); }
+            let w = std::cmp::min(WINDOW_SIZE, scalar_bits - bits);
+            for _ in 0..w { acc.double_in_place(); }
             for g in 0..NUM_GROUPS {
                 acc.add_assign(&res[g * NUM_WINDOWS + i]);
             }
             bits += w;
         }
 
-        Ok(acc)*/
-
-        return Err(GPUError {msg: "Not implemented yet!".to_string()} );
+        Ok(acc)
     }
 }

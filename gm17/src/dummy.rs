@@ -16,12 +16,9 @@ impl<ConstraintF: Field> ConstraintSynthesizer<ConstraintF> for DummyCircuit<Con
             x_val.ok_or(SynthesisError::AssignmentMissing)
         })?;
 
-        for k in 0..10_000 {
+        for _ in 0..10_000 {
             // Allocate: x * x = x2
-            let x2_val = x_val.map(|mut e| {
-                e.square();
-                e
-            });
+            let x2_val = x_val.map(|e| { e.square() });
             let x2 = cs.alloc(|| "", || {
                 x2_val.ok_or(SynthesisError::AssignmentMissing)
             })?;

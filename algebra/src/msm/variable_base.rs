@@ -89,7 +89,11 @@ impl<E> VariableBaseMSM<E> where E: PairingEngine {
         scalars: &[<G::ScalarField as PrimeField>::BigInt],
         kern: &mut Option<MultiexpKernel<E>>
     ) -> G::Projective {
-        Self::msm_inner(bases, scalars)
+        if let Some(ref mut k) = kern {
+            k.multiexp(bases, scalars).expect("GPU Multiexp failed!")
+        } else {
+            Self::msm_inner(bases, scalars)
+        }
     }
 
     pub fn gpu_multiexp_supported(log_d: u32) -> GPUResult<MultiexpKernel<E>> {

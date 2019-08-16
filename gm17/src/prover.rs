@@ -262,6 +262,10 @@ where
     );
     drop(h);
 
+    let log_d = f64::from(prover.a.len() as f64).log2().ceil() as u32;
+
+    let multiexp_kern = VariableBaseMSM::gpu_multiexp_supported::<E>(log_d).ok();
+
     // Compute A
     let a_acc_time = timer_start!(|| "Compute A");
     let (a_inputs_source, a_aux_source) = params.get_a_query(prover.num_inputs)?;

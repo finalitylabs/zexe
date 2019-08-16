@@ -1,6 +1,7 @@
 use crate::{
     AffineCurve, BigInteger, Field, FpParameters, PrimeField,
     ProjectiveCurve,
+    PairingEngine, GPUResult, MultiexpKernel
 };
 use rayon::prelude::*;
 
@@ -87,6 +88,11 @@ impl VariableBaseMSM {
         scalars: &[<G::ScalarField as PrimeField>::BigInt],
     ) -> G::Projective {
         Self::msm_inner(bases, scalars)
+    }
+
+    pub fn gpu_multiexp_supported<E>(log_d: u32) -> GPUResult<MultiexpKernel<E>> where E: PairingEngine {
+        let kern = MultiexpKernel::<E>::create(1 << log_d)?;
+        Ok(kern)
     }
 }
 

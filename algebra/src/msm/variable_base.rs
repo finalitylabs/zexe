@@ -87,6 +87,7 @@ impl<E> VariableBaseMSM<E> where E: PairingEngine {
     pub fn multi_scalar_mul<G: AffineCurve>(
         bases: &[G],
         scalars: &[<G::ScalarField as PrimeField>::BigInt],
+        kern: &mut Option<MultiexpKernel<E>>
     ) -> G::Projective {
         Self::msm_inner(bases, scalars)
     }

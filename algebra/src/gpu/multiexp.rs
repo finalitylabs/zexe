@@ -20,6 +20,10 @@ pub struct MultiexpKernel<E> where E: PairingEngine {
     g1_bucket_buffer: Buffer<structs::ProjectiveCurveStruct<E::G1Projective>>,
     g1_result_buffer: Buffer<structs::ProjectiveCurveStruct<E::G1Projective>>,
 
+    g2_base_buffer: Buffer<structs::AffineCurveStruct<E::G2Affine>>,
+    g2_bucket_buffer: Buffer<structs::ProjectiveCurveStruct<E::G2Projective>>,
+    g2_result_buffer: Buffer<structs::ProjectiveCurveStruct<E::G2Projective>>,
+
     exp_buffer: Buffer<structs::PrimeFieldStruct<E::Fr>>
 }
 
@@ -33,10 +37,15 @@ impl<E> MultiexpKernel<E> where E: PairingEngine {
         let g1buckbuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(BUCKET_LEN * NUM_WINDOWS * NUM_GROUPS).build()?;
         let g1resbuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(NUM_WINDOWS * NUM_GROUPS).build()?;
 
+        let g2basebuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(n).build()?;
+        let g2buckbuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(BUCKET_LEN * NUM_WINDOWS * NUM_GROUPS).build()?;
+        let g2resbuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(NUM_WINDOWS * NUM_GROUPS).build()?;
+
         let expbuff = Buffer::builder().queue(pq.queue().clone()).flags(MemFlags::new().read_write()).len(n).build()?;
 
         Ok(MultiexpKernel {proque: pq,
             g1_base_buffer: g1basebuff, g1_bucket_buffer: g1buckbuff, g1_result_buffer: g1resbuff,
+            g2_base_buffer: g2basebuff, g2_bucket_buffer: g2buckbuff, g2_result_buffer: g2resbuff,
             exp_buffer: expbuff})
     }
 
@@ -75,8 +84,26 @@ impl<E> MultiexpKernel<E> where E: PairingEngine {
             unsafe { kernel.enq()?; }
             let tres = unsafe { std::mem::transmute::<&mut [G::Projective], &mut [structs::ProjectiveCurveStruct::<E::G1Projective>]>(&mut res) };
             self.g1_result_buffer.read(tres).enq()?;
+        } else if sz == std::mem::size_of::<E::G2Affine>() {
+            let tbases = unsafe { std::mem::transmute::<&[G], &[structs::AffineCurveStruct<E::G2Affine>]>(&bases) };
+            self.g2_base_buffer.write(tbases).enq()?;
+            let kernel = self.proque.kernel_builder("G2_bellman_multiexp")
+                .global_work_size([gws])
+                .local_work_size([LOCAL_WORK_SIZE])
+                .arg(&self.g2_base_buffer)
+                .arg(&self.g2_bucket_buffer)
+                .arg(&self.g2_result_buffer)
+                .arg(&self.exp_buffer)
+                .arg(n as u32)
+                .arg(NUM_GROUPS as u32)
+                .arg(NUM_WINDOWS as u32)
+                .arg(WINDOW_SIZE as u32)
+                .build()?;
+            unsafe { kernel.enq()?; }
+            let tres = unsafe { std::mem::transmute::<&mut [G::Projective], &mut [structs::ProjectiveCurveStruct::<E::G2Projective>]>(&mut res) };
+            self.g2_result_buffer.read(tres).enq()?;
         } else {
-            return Err(GPUError {msg: "Only E::G1!".to_string()} );
+            return Err(GPUError {msg: "Only E::G1 and E::G2 are supported!".to_string()} );
         }
 
         let mut acc = G::Projective::zero();

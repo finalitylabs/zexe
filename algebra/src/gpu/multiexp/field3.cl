@@ -35,8 +35,8 @@ FIELD3 FIELD3_mul(FIELD3 a, FIELD3 b) {
   FIELD x = FIELD_sub(FIELD_sub(FIELD_mul(FIELD_add(a.c1, a.c2), FIELD_add(b.c1, b.c2)), be), cf);
   FIELD y = FIELD_sub(FIELD_sub(FIELD_mul(FIELD_add(a.c0, a.c1), FIELD_add(b.c0, b.c1)), ad), be);
   FIELD z = FIELD_sub(FIELD_sub(FIELD_sub(FIELD_mul(FIELD_add(a.c0, a.c2), FIELD_add(b.c0, b.c2)), ad), be), cf);
-  a.c0 = FIELD_add(ad, FIELD_mul(x, FIELD2_NONRESIDUE));
-  a.c1 = FIELD_add(y, FIELD_mul(cf, FIELD2_NONRESIDUE));
+  a.c0 = FIELD_add(ad, FIELD_mul(x, FIELD3_NONRESIDUE));
+  a.c1 = FIELD_add(y, FIELD_mul(cf, FIELD3_NONRESIDUE));
   a.c2 = z;
   return a;
 }
@@ -48,8 +48,8 @@ FIELD3 FIELD3_sqr(FIELD3 a) {
   FIELD bc = FIELD_mul(a.c1, a.c2);
   FIELD s3 = FIELD_double(bc);
   FIELD s4 = FIELD_sqr(c);
-  a.c0 = FIELD_add(s0, FIELD_mul(s3, FIELD2_NONRESIDUE));
-  a.c1 = FIELD_add(s1, FIELD_mul(s4, FIELD2_NONRESIDUE));
+  a.c0 = FIELD_add(s0, FIELD_mul(s3, FIELD3_NONRESIDUE));
+  a.c1 = FIELD_add(s1, FIELD_mul(s4, FIELD3_NONRESIDUE));
   a.c2 = FIELD_sub(FIELD_sub(FIELD_add(FIELD_add(s1, s2), s3), s0), s4);
   return a;
 }

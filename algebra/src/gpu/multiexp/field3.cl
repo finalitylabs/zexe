@@ -47,7 +47,7 @@ FIELD3 FIELD3_sqr(FIELD3 a) {
   FIELD s2 = FIELD_sqr(FIELD_add(FIELD_sub(a.c0, a.c1), a.c2));
   FIELD bc = FIELD_mul(a.c1, a.c2);
   FIELD s3 = FIELD_double(bc);
-  FIELD s4 = FIELD_sqr(c);
+  FIELD s4 = FIELD_sqr(a.c2);
   a.c0 = FIELD_add(s0, FIELD_mul(s3, FIELD3_NONRESIDUE));
   a.c1 = FIELD_add(s1, FIELD_mul(s4, FIELD3_NONRESIDUE));
   a.c2 = FIELD_sub(FIELD_sub(FIELD_add(FIELD_add(s1, s2), s3), s0), s4);

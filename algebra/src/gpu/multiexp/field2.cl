@@ -25,20 +25,21 @@ FIELD2 FIELD2_double(FIELD2 a) {
   return a;
 }
 FIELD2 FIELD2_mul(FIELD2 a, FIELD2 b) {
-  FIELD aa = FIELD_mul(a.c0, b.c0);
-  FIELD bb = FIELD_mul(a.c1, b.c1);
-  FIELD o = FIELD_add(b.c0, b.c1);
+  FIELD v0 = FIELD_mul(a.c0, b.c0);
+  FIELD v1 = FIELD_mul(a.c1, b.c1);
   a.c1 = FIELD_add(a.c1, a.c0);
-  a.c1 = FIELD_mul(a.c1, o);
-  a.c1 = FIELD_sub(a.c1, aa);
-  a.c1 = FIELD_sub(a.c1, bb);
-  a.c0 = FIELD_sub(aa, bb);
+  a.c1 = FIELD_mul(a.c1, FIELD_add(b.c0, b.c1));
+  a.c1 = FIELD_sub(a.c1, v0);
+  a.c1 = FIELD_sub(a.c1, v1);
+  a.c0 = FIELD_add(v0, FIELD_mul(v1, FIELD2_NONRESIDUE));
   return a;
 }
 FIELD2 FIELD2_sqr(FIELD2 a) {
-  FIELD ab = FIELD_mul(a.c0, a.c1);
-  FIELD c0c1 = FIELD_add(a.c0, a.c1);
-  a.c0 = FIELD_mul(FIELD_sub(a.c0, a.c1), c0c1);
-  a.c1 = FIELD_double(ab);
+  FIELD v0 = FIELD_sub(a.c0, a.c1);
+  FIELD v3 = FIELD_sub(a.c0, FIELD_mul(a.c1, FIELD2_NONRESIDUE));
+  FIELD2 v2 = FIELD_mul(a.c0, a.c1);
+  v0 = FIELD_add(FIELD_mul(v0, v3), v2);
+  a.c1 = FIELD_double(v2);
+  a.c0 = FIELD_add(v0, FIELD_mul(v2, FIELD2_NONRESIDUE));
   return a;
 }

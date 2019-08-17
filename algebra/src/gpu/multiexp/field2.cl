@@ -37,7 +37,7 @@ FIELD2 FIELD2_mul(FIELD2 a, FIELD2 b) {
 FIELD2 FIELD2_sqr(FIELD2 a) {
   FIELD v0 = FIELD_sub(a.c0, a.c1);
   FIELD v3 = FIELD_sub(a.c0, FIELD_mul(a.c1, FIELD2_NONRESIDUE));
-  FIELD2 v2 = FIELD_mul(a.c0, a.c1);
+  FIELD v2 = FIELD_mul(a.c0, a.c1);
   v0 = FIELD_add(FIELD_mul(v0, v3), v2);
   a.c1 = FIELD_double(v2);
   a.c0 = FIELD_add(v0, FIELD_mul(v2, FIELD2_NONRESIDUE));

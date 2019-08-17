@@ -2,7 +2,7 @@ use gm17::{
     create_random_proof, generate_random_parameters, prepare_verifying_key, verify_proof,
 };
 
-use algebra::{curves::bls12_377::Bls12_377, fields::bls12_377::Fr, fields::Field};
+use algebra::{curves::mnt6::MNT6, fields::mnt6::Fr, fields::Field};
 use rand::thread_rng;
 
 mod dummy;
@@ -13,11 +13,11 @@ fn main() {
 
     println!("Generating params...");
     let params =
-        generate_random_parameters::<Bls12_377, _, _>(DummyCircuit { xx: None }, rng)
+        generate_random_parameters::<MNT6, _, _>(DummyCircuit { xx: None }, rng)
             .unwrap();
     println!("Done!");
 
-    let pvk = prepare_verifying_key::<Bls12_377>(&params.vk);
+    let pvk = prepare_verifying_key::<MNT6>(&params.vk);
 
     println!("Generating proof...");
     let proof = create_random_proof(

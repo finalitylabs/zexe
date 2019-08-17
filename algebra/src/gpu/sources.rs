@@ -8,6 +8,7 @@ static FFT_SRC : &str = include_str!("fft/fft.cl");
 
 static EXP_SRC : &str = include_str!("multiexp/exp.cl");
 static FIELD2_SRC : &str = include_str!("multiexp/field2.cl");
+static FIELD3_SRC : &str = include_str!("multiexp/field3.cl");
 static EC_SRC : &str = include_str!("multiexp/ec.cl");
 static MULTIEXP_SRC : &str = include_str!("multiexp/multiexp.cl");
 
@@ -99,9 +100,11 @@ fn extract_nonresidue<E>() -> E::Fq where E: PairingEngine {
 fn field_e<E>(fielde: &str, field: &str) -> String where E: PairingEngine {
     let nonresidue : E::Fq = extract_nonresidue::<E>();
     let nonresidue = limbs_of(&nonresidue);
+    let ext = std::mem::size_of::<E::Fqe>() / std::mem::size_of::<E::Fq>();
     return format!("{}\n{}\n",
         format!("#define {}_NONRESIDUE (({}){{ {{ {} }} }})", fielde, field, join(nonresidue, ", ")),
-        String::from(FIELD2_SRC).replace("FIELD2", fielde).replace("FIELD", field));
+        if ext == 2 { String::from(FIELD2_SRC).replace("FIELD2", fielde).replace("FIELD", field) }
+        else { String::from(FIELD3_SRC).replace("FIELD3", fielde).replace("FIELD", field) });
 }
 
 pub fn multiexp_kernel<E>() -> String where E: PairingEngine {

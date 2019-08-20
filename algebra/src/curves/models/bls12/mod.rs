@@ -207,4 +207,5 @@ where
     }
 
     fn get_name() -> &'static str { "Bls12" }
+    fn get_non_residue() -> (usize, Self::Fq) { (2, P::Fp2Params::NONRESIDUE) }
 }

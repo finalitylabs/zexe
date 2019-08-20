@@ -3,9 +3,10 @@ use crate::{
     biginteger::BigInteger320,
     curves::{PairingCurve, PairingEngine, ProjectiveCurve},
     fields::{
+        models::fp3::Fp3Parameters,
         mnt6::{
             fq::{Fq, FqParameters},
-            Fq3, Fq6, Fr,
+            Fq3, Fq6, Fr, Fq3Parameters,
         },
         BitIterator, Field, FpParameters,
     },
@@ -58,6 +59,7 @@ impl PairingEngine for MNT6 {
     }
 
     fn get_name() -> &'static str { "MNT6" }
+    fn get_non_residue() -> (usize, Self::Fq) { (3, Fq3Parameters::NONRESIDUE) }
 }
 
 impl MNT6 {

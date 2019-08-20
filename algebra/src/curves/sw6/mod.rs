@@ -3,9 +3,10 @@ use crate::{
     biginteger::BigInteger832,
     curves::{PairingCurve, PairingEngine},
     fields::{
+        models::fp3::Fp3Parameters,
         sw6::{
             fq::{Fq, FqParameters},
-            Fq3, Fq6, Fr,
+            Fq3, Fq6, Fr, Fq3Parameters,
         },
         BitIterator, Field, FpParameters,
     },
@@ -56,6 +57,7 @@ impl PairingEngine for SW6 {
     }
 
     fn get_name() -> &'static str { "SW6" }
+    fn get_non_residue() -> (usize, Self::Fq) { (3, Fq3Parameters::NONRESIDUE) }
 }
 
 impl SW6 {

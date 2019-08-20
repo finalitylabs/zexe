@@ -111,6 +111,7 @@ pub trait PairingEngine: Sized + 'static + Copy + Debug + Sync + Send {
 
     // Get extra information about the engine, for OpenCL source generation.
     fn get_name() -> &'static str;
+    fn get_non_residue() -> (usize, Self::Fq);
 }
 
 /// Projective representation of an elliptic curve point guaranteed to be

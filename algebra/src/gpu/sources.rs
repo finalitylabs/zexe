@@ -1,5 +1,5 @@
 use crate::curves::PairingEngine;
-use crate::fields::{Field, PrimeField, FpParameters};
+use crate::fields::{PrimeField, FpParameters};
 use itertools::join;
 
 static DEFS_SRC : &str = include_str!("common/defs.cl");
@@ -75,36 +75,17 @@ pub fn fft_kernel<F>() -> String where F: PrimeField {
         field::<F>("Fr"), fft("Fr")));
 }
 
-fn extract_nonresidue<E>() -> E::Fq where E: PairingEngine {
-    use std::ops::SubAssign;
-    let mut one = E::Fqe::one();
-    let ext = std::mem::size_of::<E::Fqe>() / std::mem::size_of::<E::Fq>();
-    if ext == 2 {
-        let tone = unsafe { std::mem::transmute::<&mut E::Fqe,&mut [E::Fq; 2]>(&mut one) };
-        tone[1] = tone[0];
-        one.square_in_place();
-        tone[0].sub_assign(&E::Fq::one());
-        return tone[0];
-    } else if ext == 3 {
-        let tone = unsafe { std::mem::transmute::<&mut E::Fqe,&mut [E::Fq; 3]>(&mut one) };
-        tone[1] = tone[0];
-        tone[2] = tone[0];
-        one.square_in_place();
-        tone[1].sub_assign(&E::Fq::one().double());
-        return tone[1];
-    } else {
-        panic!("Cannot extract non-residue!");
-    }
-}
-
 fn field_e<E>(fielde: &str, field: &str) -> String where E: PairingEngine {
-    let nonresidue : E::Fq = extract_nonresidue::<E>();
+    let (ext, nonresidue) = E::get_non_residue();
     let nonresidue = limbs_of(&nonresidue);
-    let ext = std::mem::size_of::<E::Fqe>() / std::mem::size_of::<E::Fq>();
+    let src =
+        if ext == 2 { String::from(FIELD2_SRC).replace("FIELD2", fielde).replace("FIELD", field) }
+        else if ext == 3 { String::from(FIELD3_SRC).replace("FIELD3", fielde).replace("FIELD", field) }
+        else { panic!("Unsupported extension field!") };
+
     return format!("{}\n{}\n",
         format!("#define {}_NONRESIDUE (({}){{ {{ {} }} }})", fielde, field, join(nonresidue, ", ")),
-        if ext == 2 { String::from(FIELD2_SRC).replace("FIELD2", fielde).replace("FIELD", field) }
-        else { String::from(FIELD3_SRC).replace("FIELD3", fielde).replace("FIELD", field) });
+        src);
 }
 
 pub fn multiexp_kernel<E>() -> String where E: PairingEngine {

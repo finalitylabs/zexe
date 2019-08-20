@@ -1,3 +1,5 @@
+// Short Weierstrass Jacobian (Used in Bls12_377, Bls12_381)
+
 #define POINT_ZERO ((POINT_projective){FIELD_ZERO, FIELD_ONE, FIELD_ZERO})
 
 typedef struct {

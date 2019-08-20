@@ -9,7 +9,9 @@ static FFT_SRC : &str = include_str!("fft/fft.cl");
 static EXP_SRC : &str = include_str!("multiexp/exp.cl");
 static FIELD2_SRC : &str = include_str!("multiexp/field2.cl");
 static FIELD3_SRC : &str = include_str!("multiexp/field3.cl");
-static EC_SRC : &str = include_str!("multiexp/ec.cl");
+static EC_SWJ_SRC : &str = include_str!("multiexp/ecswj.cl");
+static EC_SWP_SRC : &str = include_str!("multiexp/ecswp.cl");
+static EC_TEE_SRC : &str = include_str!("multiexp/ectee.cl");
 static MULTIEXP_SRC : &str = include_str!("multiexp/multiexp.cl");
 
 fn limbs_of<T>(value: &T) -> &[u64] {
@@ -57,10 +59,14 @@ fn fft(field: &str) -> String {
         .replace("FIELD", field);
 }
 
-fn ec(field: &str, point: &str) -> String {
-    return String::from(EC_SRC)
-        .replace("FIELD", field)
-        .replace("POINT", point);
+fn ec<E>(field: &str, point: &str) -> String where E: PairingEngine {
+    if E::get_name() == "Bls12" {
+        return String::from(EC_SWJ_SRC).replace("FIELD", field).replace("POINT", point);
+    } else if E::get_name() == "MNT6" || E::get_name() == "SW6" {
+        return String::from(EC_SWP_SRC).replace("FIELD", field).replace("POINT", point);
+    } else {
+        panic!("Curve unknown!");
+    }
 }
 
 fn multiexp(point: &str, exp: &str) -> String {
@@ -92,6 +98,6 @@ pub fn multiexp_kernel<E>() -> String where E: PairingEngine {
     return String::from(format!("{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}",
         DEFS_SRC,
         exponent::<E::Fr>("Exp"),
-        field::<E::Fq>("Fq"), ec("Fq", "G1"), multiexp("G1", "Exp"),
-        field_e::<E>("Fqe", "Fq"), ec("Fqe", "G2"), multiexp("G2", "Exp")));
+        field::<E::Fq>("Fq"), ec::<E>("Fq", "G1"), multiexp("G1", "Exp"),
+        field_e::<E>("Fqe", "Fq"), ec::<E>("Fqe", "G2"), multiexp("G2", "Exp")));
 }

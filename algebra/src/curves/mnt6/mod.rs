@@ -56,6 +56,8 @@ impl PairingEngine for MNT6 {
     fn final_exponentiation(r: &Self::Fqk) -> Option<Self::Fqk> {
         Some(MNT6::final_exponentiation(r))
     }
+
+    fn get_name() -> &'static str { "MNT6" }
 }
 
 impl MNT6 {
@@ -302,7 +304,7 @@ impl MNT6 {
 pub const TWIST: Fq3 = field_new!(Fq3, FQ_ZERO, FQ_ONE, FQ_ZERO);
 pub const FQ_ZERO: Fq = field_new!(Fq, BigInteger320([0, 0, 0, 0, 0]));
 pub const FQ_ONE: Fq = field_new!(Fq, FqParameters::R);
-pub const TWIST_COEFF_A: Fq3 = field_new!(Fq3, 
+pub const TWIST_COEFF_A: Fq3 = field_new!(Fq3,
     FQ_ZERO,
     FQ_ZERO,
     field_new!(Fq, BigInteger320([

@@ -54,6 +54,8 @@ impl PairingEngine for SW6 {
     fn final_exponentiation(r: &Self::Fqk) -> Option<Self::Fqk> {
         Some(SW6::final_exponentiation(r))
     }
+
+    fn get_name() -> &'static str { "SW6" }
 }
 
 impl SW6 {

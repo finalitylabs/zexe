@@ -205,4 +205,6 @@ where
             None => None,
         }
     }
+
+    fn get_name() -> &'static str { "Bls12" }
 }

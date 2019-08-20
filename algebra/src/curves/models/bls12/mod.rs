@@ -208,4 +208,5 @@ where
 
     fn get_name() -> &'static str { "Bls12" }
     fn get_non_residue() -> (usize, Self::Fq) { (2, P::Fp2Params::NONRESIDUE) }
+    fn get_g1_coeffs() -> (Self::Fq, Self::Fq) { (P::G1Parameters::COEFF_A, P::G1Parameters::COEFF_B) }
 }

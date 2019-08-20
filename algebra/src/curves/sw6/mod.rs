@@ -1,7 +1,7 @@
 use crate::field_new;
 use crate::{
     biginteger::BigInteger832,
-    curves::{PairingCurve, PairingEngine},
+    curves::{models::SWModelParameters, PairingCurve, PairingEngine},
     fields::{
         models::fp3::Fp3Parameters,
         sw6::{
@@ -13,6 +13,7 @@ use crate::{
 };
 
 pub mod g1;
+use self::g1::SW6G1Parameters;
 pub use self::g1::{G1Affine, G1Projective};
 
 pub mod g2;
@@ -58,6 +59,7 @@ impl PairingEngine for SW6 {
 
     fn get_name() -> &'static str { "SW6" }
     fn get_non_residue() -> (usize, Self::Fq) { (3, Fq3Parameters::NONRESIDUE) }
+    fn get_g1_coeffs() -> (Self::Fq, Self::Fq) { (SW6G1Parameters::COEFF_A, SW6G1Parameters::COEFF_B) }
 }
 
 impl SW6 {
@@ -66,7 +68,7 @@ impl SW6 {
     }
 
     fn ate_miller_loop(p: &G1Affine, q: &G2Affine) -> Fq6 {
-        use crate::curves::{models::SWModelParameters, sw6::g2::SW6G2Parameters};
+        use crate::curves::sw6::g2::SW6G2Parameters;
 
         let px = p.x;
         let py = p.y;

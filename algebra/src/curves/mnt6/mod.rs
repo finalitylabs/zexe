@@ -1,7 +1,7 @@
 use crate::field_new;
 use crate::{
     biginteger::BigInteger320,
-    curves::{PairingCurve, PairingEngine, ProjectiveCurve},
+    curves::{models::SWModelParameters, PairingCurve, PairingEngine, ProjectiveCurve},
     fields::{
         models::fp3::Fp3Parameters,
         mnt6::{
@@ -18,6 +18,7 @@ pub mod g2;
 mod tests;
 
 use self::g2::{AteAdditionCoefficients, AteDoubleCoefficients, G2ProjectiveExtended};
+use self::g1::MNT6G1Parameters;
 pub use self::{
     g1::{G1Affine, G1Prepared, G1Projective},
     g2::{G2Affine, G2Prepared, G2Projective},
@@ -60,6 +61,7 @@ impl PairingEngine for MNT6 {
 
     fn get_name() -> &'static str { "MNT6" }
     fn get_non_residue() -> (usize, Self::Fq) { (3, Fq3Parameters::NONRESIDUE) }
+    fn get_g1_coeffs() -> (Self::Fq, Self::Fq) { (MNT6G1Parameters::COEFF_A, MNT6G1Parameters::COEFF_B) }
 }
 
 impl MNT6 {
